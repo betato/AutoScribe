@@ -16,7 +16,7 @@ import time
 # CONSTANTS
 white = (255,255,255)
 black = (0,0,0)
-pen_thickness = 30
+pen_thickness = 2
 file_name = "whiteboard.jpg"
 
 # FUNCTIONS
@@ -28,7 +28,7 @@ def draw_current():
         reader = csv.reader(file, delimiter = ',')
         coordinates = []
         for row in reader:
-            coordinates.append(Prototype1.get_coordinate((float(row[0]),float(row[1]))))
+            coordinates.append(Prototype1.get_coordinate((float(row[0])*0.00047123889,float(row[1])*0.00047123889)))
     return(coordinates)
 
 def get_email():
@@ -43,7 +43,8 @@ def get_email():
 canvas = pg.display.set_mode((Prototype1.X_PIXELS,Prototype1.Y_PIXELS))
 canvas.fill(white)
 
-for i in range(0,4): #change this loop to while true when actually using the device
+while True: #change this loop to while true when actually using the device
+    draw_current()
     pg.draw.lines(canvas, black, False, draw_current(), pen_thickness)
     pg.image.save(canvas,file_name)
 

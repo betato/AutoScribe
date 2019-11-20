@@ -13,16 +13,12 @@ import csv
 
 # CONSTANTS (metres)
 aspectRatio = 9 / 16
-BOARD_WIDTH = 2.0
+BOARD_WIDTH = 2
 BOARD_HEIGHT = BOARD_WIDTH * aspectRatio
 SPOOL_DISTANCE = 0.6
-SIDE_GAP = 0.0
 
 X_PIXELS = 4500
 Y_PIXELS = int(round(X_PIXELS * aspectRatio))
-
-testA = 1 - SIDE_GAP
-testB = 1 - SIDE_GAP
 
 # FUNCTIONS
 
