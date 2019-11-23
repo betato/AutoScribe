@@ -1,12 +1,13 @@
 #pragma once
 
-#include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
+#include <WiFiClient.h>
 
 const char *ssid = "DeliciousSuspicious";
 const char *pass =  "chamfers";
+#define SERVER_ADDRESS "http://192.168.137.8"
 
 #define ENCODER_L_PHASE_A 4
 #define ENCODER_L_PHASE_B 5
@@ -38,46 +39,43 @@ void setupIO() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 }
 
-#define SERVER_ADDRESS "http://192.168.137.70"
-#define SERVER_PORT 9000
+WiFiClient wifiClient;
+HTTPClient http;
 
 void setupWifi() {
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) 
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
+  Serial.println("\nWiFi connected");
+
+  http.setTimeout(1000);
 }
 
 // String lengths to transmit
 int logLen = 0;
-int rLengths[1000];
-int lLengths[1000];
-
-WiFiClient wifiClient;
-HTTPClient http;
+short rLengths[1000];
+short lLengths[1000];
 
 // String length tracking
 #define LOG_STEP 4
-int rLastLog = 0;
-int lLastLog = 0;
+short rLastLog = 0;
+short lLastLog = 0;
 
 // Encoder reading
-int countL = 0; 
+short countL = 0;
+short countR = 0; 
 int prevL = HIGH;
-int countR = 0; 
 int prevR = HIGH;
 
 // Button reading
-bool recording = false;
 int buttonPrev = HIGH;
 bool timing = false;
 unsigned long debounceTimer;
+bool recording = false;
 
 void loop() {
   checkEncoders();
@@ -123,18 +121,38 @@ void trackStrings() {
     Serial.println(countL);
     
     if (logLen >= 1000) {
-      //transmitLengths();
-      logLen = 0;
+      transmitLengths();
     }
   }
 }
 
 void transmitLengths() {
-  Serial.println("aaaa");
-  http.begin(SERVER_ADDRESS, SERVER_PORT);
-  http.addHeader("Content-Type", "text/html");
-  int httpCode = http.POST("aaa");
+  Serial.println("\nTransmit Begin");
+  http.begin(SERVER_ADDRESS);
+  // Put both short arrays into a byte array alternating from left to right
+  char b[logLen*4];
+  for (int i=0; i<logLen; i++) {
+    b[i*4] = (lLengths[i])&255;
+    b[i*4+1] = (lLengths[i] << 8)&255;
+    b[i*4+2] = (rLengths[i])&255;
+    b[i*4+3] = (rLengths[i] << 8)&255;
+    
+    Serial.print("L:");
+    Serial.print((lLengths[i])&255);
+    Serial.print("-");
+    Serial.print((lLengths[i] << 8)&255);
+    Serial.print("\nR:");
+    Serial.print((rLengths[i])&255);
+    Serial.print("-");
+    Serial.print((rLengths[i] << 8)&255);
+    Serial.println("");
+  }
+  Serial.println(logLen*4);
+  // Send it
+  http.POST(b);
+  logLen = 0;
   http.end();
+  Serial.println("Transmit Complete");
 }
 
 void checkButton() {
@@ -148,6 +166,7 @@ void checkButton() {
     // Time elapsed
     int reading = digitalRead(BUTTON_PIN);
     if (reading != buttonPrev) {
+      // Button pressed/released
       recording = !reading;
       if (reading) {
         buttonUp();
@@ -162,10 +181,9 @@ void checkButton() {
 
 void buttonDown() {
   Serial.println("Button Pressed");
-  transmitLengths();
 }
 
 void buttonUp() {
   Serial.println("Button Released");
+  transmitLengths();
 }
-
