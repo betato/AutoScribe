@@ -12,57 +12,72 @@ import math
 import pygame as pg
 import csv
 import time
+import serial
 
 # CONSTANTS
 white = (255,255,255)
 black = (0,0,0)
-pen_thickness = 30
+pen_thickness = 5
 file_name = "whiteboard.jpg"
-
-# FUNCTIONS
-def draw_current():
-    '''() -> (list of tuples)
-    Reads file of string lengths and adds current pen stroke to already existing canvas
-    Saves the file'''
-    with open('lengths.txt') as file:
-        reader = csv.reader(file, delimiter = ',')
-        coordinates = []
-        for row in reader:
-            coordinates.append(Prototype1.get_coordinate((float(row[0]),float(row[1]))))
-    return(coordinates)
-
-def get_email():
-    '''() -> (String)
-    Reads DashboardInfo.txt and returns email inside
-    '''
-    with open('DashboardInfo.txt') as file:
-        reader = csv.reader(file, delimiter = ',')
-    return(reader[0][1])
+length_coeff = 0.002
 
 # MAIN
-canvas = pg.display.set_mode((Prototype1.X_PIXELS,Prototype1.Y_PIXELS))
+canvas = pg.Surface((Prototype1.X_PIXELS,Prototype1.Y_PIXELS))
 canvas.fill(white)
+ser = serial.Serial('COM6', 2000000, timeout=.1) # Establish the connection on a specific port
+print("Serial Connected")
+lengths = []
+last_time = time.time()
+writing = False
 
-for i in range(0,4): #change this loop to while true when actually using the device
-    pg.draw.lines(canvas, black, False, draw_current(), pen_thickness)
-    pg.image.save(canvas,file_name)
+while True: #change this loop to while true when actually using the device
+    
+    while ser.in_waiting or writing:
+        line = str(ser.readline())[2:-5:]
+        if line == 'START':
+            writing = True
+            print("Writing Started")
+        elif line == 'END':
+            writing = False
+            print("Writing Complete")
+        elif len(line) >  2:
+            split = line.split(', ')
+            print(split[0], split[1])
+            lengths.append((float(split[0]), float(split[1])))
 
-    dash_file = open('DashboardInfo.txt', 'r')
-    dash_info = []
-    for i in range (0,3):
-        dash_info.append(dash_file.readline())
-        #0 for dont send, 1 for send
-        #email to send to
-        #clear screen?
-    dash_file.close()
-
-    print('1' in dash_info[0])
-
-    if '1' in dash_info[0]:
-        emailer.send_email(dash_info[1])
-    if '1' in dash_info[2]:
-        canvas.fill(white)
+    #current_time = time.time()
+    #current_time >= last_time + 2:
+    if len(lengths) > 1:
+        #last_time = current_time
+        print('Creating Image')
+        coords = []
+        for length in lengths:
+            coords.append(Prototype1.get_coordinate((length_coeff*float(length[0]),length_coeff*float(length[1]))))
+        pg.draw.lines(canvas, black, False, coords, pen_thickness)
         pg.image.save(canvas,file_name)
-        emailer.send_email(dash_info[1])
-        
-    time.sleep(10) # use shorter time for real use
+        coords.clear()
+        lengths.clear()
+        print('Image Created')
+
+        email_file = open('email.txt', 'r')
+        email_info = email_file.readline()
+        email_file.close()
+
+        reset_file = open('reset.txt', 'r')
+        reset_info = reset_file.readline()
+        reset_file.close()
+
+        if '*' not in email_info:
+            #emailer.send_email(email_info)
+            # overwrite file with '*'
+            email_file = open('email.txt', 'w')
+            email_file.write('*')
+            print("email sent")
+
+        if '1' in reset_info:
+            canvas.fill(white)
+            pg.image.save(canvas,file_name)
+            #emailer.send_email(email_info)
+            reset_file = open('reset.txt', 'w')
+            reset_file.write('0')
+            print("canvas cleared")

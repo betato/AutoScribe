@@ -4,7 +4,6 @@ Goal:
 - take list of coordinates and create an image that can be exported
 
 Notes:
-- a 9:16 aspect ratio maximizes area used on most phone screens
 - this code will be ran each time the pen is lifted from the board
 '''
 
@@ -13,13 +12,14 @@ import pygame as pg
 import csv
 
 # CONSTANTS (metres)
-BOARD_WIDTH = 1.0
-BOARD_HEIGHT = BOARD_WIDTH * 16 / 9
+aspectRatio = 9 / 16
+BOARD_WIDTH = 4
+BOARD_HEIGHT = BOARD_WIDTH * aspectRatio
 SPOOL_DISTANCE = 0.6
 SIDE_GAP = 0.0
 
 X_PIXELS = 4500
-Y_PIXELS = 8000
+Y_PIXELS = int(round(X_PIXELS * aspectRatio))
 
 testA = 1 - SIDE_GAP
 testB = 1 - SIDE_GAP
@@ -42,13 +42,13 @@ def get_coordinate(lengths):
         b_angle = 0.5
     y_length = BOARD_HEIGHT - ( (BOARD_HEIGHT-SPOOL_DISTANCE) / 2 + a*math.cos(math.asin(b_angle)) )
 
-    x_coord = round(x_length / BOARD_WIDTH * X_PIXELS)
+    x_coord = round(x_length / BOARD_WIDTH * X_PIXELS) + (X_PIXELS/10)
     y_coord = round(y_length / BOARD_HEIGHT * Y_PIXELS)
 
     return((x_coord,y_coord))
 
 # MAIN
-
+'''
 # setup
 white = (255,255,255)
 black = (0,0,0)
@@ -75,7 +75,6 @@ for raw_val in raw_lengths:
 #print(coordinates)
 
 # drawing
-pg.draw.rect(canvas, black, (10,10,4480,7980), 50)
 pg.draw.lines(canvas, black, False, coordinates, pen_thickness)
 pg.draw.lines(canvas, black, False, sine_curve, pen_thickness)
 
@@ -96,3 +95,4 @@ while True:
             if event.key == pg.K_ESCAPE:
                 pg.quit()
                 raise SystemExit
+'''

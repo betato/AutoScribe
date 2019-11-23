@@ -20,7 +20,6 @@ const char *pass =  "chamfers";
 void setup() {
   Serial.begin(2000000);
   setupIO();
-  //setupWifi();
 }
 
 void setupIO() {
@@ -41,29 +40,10 @@ void setupIO() {
   digitalWrite(15, LOW);
 }
 
-#define SERVER_ADDRESS "http://192.168.137.70"
-#define SERVER_PORT 9000
-
-void setupWifi() {
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) 
-  {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-}
-
 // String lengths to transmit
 int logLen = 0;
 int rLengths[1000];
 int lLengths[1000];
-
-WiFiClient wifiClient;
-HTTPClient http;
 
 // String length tracking
 #define LOG_STEP 2
@@ -71,9 +51,9 @@ int rLastLog = 0;
 int lLastLog = 0;
 
 // Encoder reading
-int countL = 10; 
+int countL = 550; 
 int prevL = HIGH;
-int countR = 10; 
+int countR = 550; 
 int prevR = HIGH;
 
 // Button reading
@@ -91,9 +71,9 @@ void checkEncoders() {
   int l = digitalRead(ENCODER_L_PHASE_A);
   if (l != prevL && l == HIGH){ // Pulse occurred
     if (digitalRead(ENCODER_L_PHASE_B) != l) {
-      countL--;
-    } else {
       countL++;
+    } else {
+      countL--;
     }
     trackStrings();
   }
@@ -102,9 +82,9 @@ void checkEncoders() {
   int r = digitalRead(ENCODER_R_PHASE_A);
   if (r != prevR && r == HIGH){ // Pulse occurred
     if (digitalRead(ENCODER_R_PHASE_B) != r) {
-      countR++;
-    } else {
       countR--;
+    } else {
+      countR++;
     }
     trackStrings();
   }
@@ -113,31 +93,19 @@ void checkEncoders() {
 
 void trackStrings() {
   if (recording) {
-    // Log any large movements
-    //if (abs(countR-rLastLog) > LOG_STEP || abs(countL-lLastLog) > LOG_STEP) {
-      rLastLog = countR;
-      lLastLog = countL;
-      rLengths[logLen] = countR;
-      lLengths[logLen] = countL;
-      logLen++;
-      Serial.print(countL);
-      Serial.print(", ");
-      Serial.println(countR);
-      
-      if (logLen >= 1000) {
-        //transmitLengths();
-        logLen = 0;
-      }
-    //}
+    rLastLog = countR;
+    lLastLog = countL;
+    rLengths[logLen] = countR;
+    lLengths[logLen] = countL;
+    logLen++;
+    Serial.print(countL);
+    Serial.print(", ");
+    Serial.println(countR);
+    
+    if (logLen >= 1000) {
+      logLen = 0;
+    }
   }
-}
-
-void transmitLengths() {
-  Serial.println("aaaa");
-  http.begin(SERVER_ADDRESS, SERVER_PORT);
-  http.addHeader("Content-Type", "text/html");
-  int httpCode = http.POST("aaa");
-  http.end();
 }
 
 void checkButton() {
@@ -164,12 +132,11 @@ void checkButton() {
 }
 
 void buttonDown() {
-  Serial.println("Button Pressed");
+  Serial.println("START");
   digitalWrite(15, HIGH);
-  //transmitLengths();
 }
 
 void buttonUp() {
-  Serial.println("Button Released");
+  Serial.println("END");
   digitalWrite(15, LOW);
 }
