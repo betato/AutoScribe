@@ -51,9 +51,9 @@ int rLastLog = 0;
 int lLastLog = 0;
 
 // Encoder reading
-int countL = 550; 
+int countL = 520; 
 int prevL = HIGH;
-int countR = 550; 
+int countR = 520; 
 int prevR = HIGH;
 
 // Button reading

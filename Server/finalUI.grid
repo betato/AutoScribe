@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><abs contexttype="opengear" id="_top" style="file:/C:/Users/joshb/Desktop/picture.jpg;">
+   <timer autostart="true" id="test" pattern="HH:mm:ss" rate="500" start="00:00:00" stop="24:00:00">
+      <timertask tasktype="ogscript">/*! block id=1004 !*/
+ogscript.setStyle("_top", "bg-u:file:/C:/Users/joshb/Desktop/picture.jpg;");
+/*!!
+ &lt;block id="1004" type="ogscript_setstyle" x="214" y="169" w="243" ID="_top" STYLE="bg-u:file:/C:/Users/joshb/Desktop/picture.jpg;" /&gt;
+!!*/
+/*!!&lt;checksum&gt;99390c1507acc395f91d373e4fbec5f4&lt;/checksum&gt;!!*/</timertask>
+   </timer>
+   <timer autostart="true" id="Display" pattern="HH:mm:ss" rate="500" start="00:00:00" stop="23:59:59">
+      <timertask>
+         <abs style="bg-u;file:/C:/Users/joshb/Desktop/picture 2.jpg"/>
+      </timertask>
+   </timer>
+   <meta>
+      <params>
+         <param access="1" maxlength="0" name="Email Entry" oid="Email_Entry" type="STRING" value="josh.beals" widget="text"/>
+         <param access="1" maxlength="0" name="display" oid="0x2" type="STRING" value="" widget="default"/>
+         <param access="1" maxlength="0" name="test" oid="test" type="STRING" value="" widget="label"/>
+      </params>
+   </meta>
+   <abs bottom="-3" height="98" left="1" right="1" style="bg#921919;bg-fill:fit;">
+      <label bottom="3" left="460" name="AutoScribe" style="txt-align:center;font:bold;size:Bigger;" top="1" width="217"/>
+      <param expand="true" height="34" left="39" oid="Email_Entry" top="44" width="159">
+         <task tasktype="ogscript">/*! block id=1007,1008 !*/
+ogscript.saveToFile("bg-u:file:/C:/Users/joshb/Desktop/test email.txt;", params.getValue('Email_Entry', 0), false);
+/*!!
+ &lt;block id="1007" type="ogscript_writetofile" x="219" y="115" w="243" FILE="bg-u:file:/C:/Users/joshb/Desktop/test email.txt;" DATA="ID:1008" APPEND="false" /&gt;
+&lt;block id="1008" type="param__top&amp;amp;Email Entry (Email_Entry)[0]" x="6" y="206" w="243" SET="" /&gt;
+!!*/
+/*!!&lt;checksum&gt;a2fd388fbbd0ac334cb8f5e25db061ec&lt;/checksum&gt;!!*/</task>
+      </param>
+      <label height="42" left="42" name="Enter Email" style="txt-align:center;font:bold;size:Big;" top="1" width="156"/>
+      <button buttontype="push" height="36" left="223" name="Save Board" top="31" width="156">
+         <task tasktype="ogscript">/*! block id=1031,1032,1030 !*/
+ogscript.saveToFile("file:/C:/Users/joshb/Desktop/email.txt", params.getValue('Email_Entry', 0), true);
+/*!!
+ &lt;block id="1031" type="ogscript_writetofile" x="477" y="161" w="243" FILE="ID:1032" DATA="ID:1030" APPEND="true" /&gt;
+&lt;block id="1032" type="ogscript_openfile" x="25" y="139" w="243" PATH="bg-u:file:/C:/Users/joshb/Desktop/testemail.txt;" APPEND="true" /&gt;
+&lt;block id="1030" type="param__top&amp;amp;Email Entry (Email_Entry)[0]" x="27" y="215" w="243" SET="" /&gt;
+!!*/
+/*!!&lt;checksum&gt;f077121d5c3017aae28dd69a2bb3b566&lt;/checksum&gt;!!*/</task>
+      </button>
+      <button buttontype="push" height="40" left="842" name="Reset Board" top="28" width="217">
+         <task tasktype="ogscript">/*! block id=1036,1037,1041 !*/
+ogscript.saveToFile("file:/C:/Users/joshb/Desktop/reset.txt", "1", true);
+/*!!
+ &lt;block id="1036" type="ogscript_writetofile" x="338" y="117" w="243" FILE="ID:1037" DATA="ID:1041" APPEND="false" /&gt;
+&lt;block id="1037" type="ogscript_openfile" x="116" y="72" w="243" PATH="bg-u:file:/C:/Users/joshb/Desktop/testemail.txt;" APPEND="false" /&gt;
+&lt;block id="1041" type="string" x="52" y="215" w="168" VALUE="true" /&gt;
+!!*/
+/*!!&lt;checksum&gt;ce786fb281a99e568204095e84eef47a&lt;/checksum&gt;!!*/</task>
+      </button>
+   </abs>
+</abs>

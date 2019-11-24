@@ -19,7 +19,7 @@ white = (255,255,255)
 black = (0,0,0)
 pen_thickness = 5
 file_name = "whiteboard.jpg"
-length_coeff = 0.002
+length_coeff = 0.0009
 
 # MAIN
 canvas = pg.Surface((Prototype1.X_PIXELS,Prototype1.Y_PIXELS))
@@ -45,10 +45,8 @@ while True: #change this loop to while true when actually using the device
             print(split[0], split[1])
             lengths.append((float(split[0]), float(split[1])))
 
-    #current_time = time.time()
-    #current_time >= last_time + 2:
+    
     if len(lengths) > 1:
-        #last_time = current_time
         print('Creating Image')
         coords = []
         for length in lengths:
@@ -59,6 +57,11 @@ while True: #change this loop to while true when actually using the device
         lengths.clear()
         print('Image Created')
 
+
+    # Check if 2 seconds have passed#
+    current_time = time.time()
+    if current_time >= last_time + 2:
+        last_time = current_time
         email_file = open('email.txt', 'r')
         email_info = email_file.readline()
         email_file.close()
@@ -68,16 +71,15 @@ while True: #change this loop to while true when actually using the device
         reset_file.close()
 
         if '*' not in email_info:
-            #emailer.send_email(email_info)
+            emailer.send_email(email_info)
             # overwrite file with '*'
             email_file = open('email.txt', 'w')
             email_file.write('*')
             print("email sent")
-
+        
         if '1' in reset_info:
             canvas.fill(white)
             pg.image.save(canvas,file_name)
-            #emailer.send_email(email_info)
             reset_file = open('reset.txt', 'w')
             reset_file.write('0')
             print("canvas cleared")
