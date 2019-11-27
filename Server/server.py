@@ -6,8 +6,8 @@ import time
 import serial
 
 # Board Constants / Vars
-ASPECT_RATIO = 9 / 16
-BOARD_WIDTH = 4
+ASPECT_RATIO = 7 / 16
+BOARD_WIDTH = 2
 BOARD_HEIGHT = BOARD_WIDTH * ASPECT_RATIO
 SPOOL_DISTANCE = 0.6
 SIDE_GAP = 0.0
@@ -20,7 +20,7 @@ WHITE = (255,255,255)
 BLACK = (0,0,0)
 PEN_THICKNESS = 5
 IMAGE_NAME = "whiteboard.jpg"
-LENGTH_COEFF = 0.0009
+LENGTH_COEFF = 0.00095
 
 # Update Constants / Vars
 IMAGE_UPDATE = 2 # Minimum time between saving new images when updates occurr
@@ -33,7 +33,7 @@ writing = False
 
 # Init
 print("Establishing Serial Connection", end='')
-ser = serial.Serial('COM6', 2000000, timeout=.1)
+ser = serial.Serial('COM5', 2000000, timeout=.1)
 print(" - Done")
 canvas = pygame.Surface((X_PIXELS, Y_PIXELS))
 canvas.fill(WHITE)
@@ -70,8 +70,8 @@ def get_coordinate(lengths):
         b_angle = 0.5
     y_length = BOARD_HEIGHT - ( (BOARD_HEIGHT-SPOOL_DISTANCE) / 2 + a*math.cos(math.asin(b_angle)) )
 
-    x_coord = round(x_length / BOARD_WIDTH * X_PIXELS) + (X_PIXELS/10)
-    y_coord = round(y_length / BOARD_HEIGHT * Y_PIXELS)
+    x_coord = round(x_length / BOARD_WIDTH * X_PIXELS) + (X_PIXELS/8)
+    y_coord = round(y_length / BOARD_HEIGHT * Y_PIXELS) + (Y_PIXELS/5)
 
     return((x_coord,y_coord))
 
@@ -104,7 +104,7 @@ def check_dashboard():
         email_file = open('email.txt', 'w')
         email_file.write('*')
         print("email sent")
-    
+
     if '1' in reset_info:
         canvas.fill(WHITE)
         pygame.image.save(canvas,IMAGE_NAME)
